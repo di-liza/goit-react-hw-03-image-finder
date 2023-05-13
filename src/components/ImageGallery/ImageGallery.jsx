@@ -4,39 +4,53 @@ import Button from 'components/Button/Button';
 
 export default class ImageGallery extends Component {
   state = {
-    images: null,
+    images: [],
     page: 1,
     error: false,
-    status: 'indle',
+    status: 'idle',
     query: '',
   };
+
   componentDidUpdate(prevProps) {
+    console.log('will update');
     const prevQuery = prevProps.searchQuery;
     const nextQuery = this.props.searchQuery;
 
     if (prevQuery !== nextQuery) {
-      this.setState({ status: 'pending' });
-      console.log(this.state.page);
-      PixabayApi.fetchPixabay(nextQuery, this.state.page)
+      this.setState({ status: 'pending', page: 1 });
+      PixabayApi.fetchPixabay(nextQuery, 1)
         .then(images =>
-          this.setState({ images, status: 'resolved', query: nextQuery })
+          this.setState({
+            images: images.hits,
+            status: 'resolved',
+            query: nextQuery,
+          })
         )
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
 
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return (
+  //     this.state.images !== nextState.images ||
+  //     this.state.status !== nextState.status
+  //   );
+  // }
   handleLoadMoreBTN = () => {
-    this.setState(
-      prevState => ({
-        page: prevState.page + 1,
-      }),
-      () => {
-        PixabayApi.fetchPixabay(this.state.query, this.state.page)
-          .then(images => this.setState({ images, status: 'resolved' }))
-          .catch(error => this.setState({ error, status: 'rejected' }));
-      }
-    );
+    const { query, page, images } = this.state;
+
+    this.setState({ status: 'loadMore' });
+    PixabayApi.fetchPixabay(query, page + 1)
+      .then(newImages => {
+        this.setState({
+          images: [...images, ...newImages.hits],
+          status: 'resolved',
+          page: page + 1,
+        });
+      })
+      .catch(error => this.setState({ error, status: 'rejected' }));
   };
+
   render() {
     const { images, error, status } = this.state;
 
@@ -53,10 +67,12 @@ export default class ImageGallery extends Component {
       return (
         <>
           <ul>
-            {images.hits.map(image => (
+            {images.map(image => (
               <li key={image.id}>
-                <img src={image.webformatURL} alt={image.tags} />
-                <p>{image.tags}</p>
+                <a href={image.webformatURL}>
+                  <img src={image.webformatURL} alt={image.tags} />
+                  <p>{image.tags}</p>
+                </a>
               </li>
             ))}
           </ul>
