@@ -16,7 +16,12 @@ export const Overlay = styled.div`
     transform: translate(-50%, -50%);
 
     background-color: #fff;
-    width: 350px;
-    height: 200px;
+    width: 700px;
+    height: 500px;
+  }
+  .modalImg {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
   }
 `;

@@ -4,7 +4,7 @@ import Button from 'components/Button/Button';
 
 import { GalleryList, ColorRingWrapper } from './ImageGallery.styled';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
-
+import Modal from '../Modal';
 import { ColorRing } from 'react-loader-spinner';
 
 export default class ImageGallery extends Component {
@@ -14,6 +14,8 @@ export default class ImageGallery extends Component {
     error: false,
     status: 'idle',
     query: '',
+    showModal: false,
+    activeCardId: 0,
   };
 
   componentDidUpdate(prevProps) {
@@ -52,26 +54,34 @@ export default class ImageGallery extends Component {
     }, 1000);
   };
 
+  setActiveIndex = id => {
+    this.setState({ activeCardId: id });
+    this.toggleModal();
+  };
+  toggleModal = () => {
+    console.log('click');
+    return this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
   render() {
-    const { images, error, status, page } = this.state;
-    console.log(status);
-
+    const { images, error, status, page, activeCardId, showModal } = this.state;
     const isEndOfListReached = images.length / 12 < page;
+    const activeCard = images.find(({ id }) => id === activeCardId);
 
-    if (status === 'idle') {
-      return <p>Please, enter the name of image for search</p>;
-    }
     if (status === 'pending') {
       return (
         <>
           <GalleryList>
-            {images.map(({ id, webformatURL, tags }) => (
-              <ImageGalleryItem
-                key={id}
-                webformatURL={webformatURL}
-                tags={tags}
-              />
-            ))}
+            {images.map(({ id, webformatURL, tags }) => {
+              return (
+                <ImageGalleryItem
+                  key={id}
+                  webformatURL={webformatURL}
+                  tags={tags}
+                />
+              );
+            })}
           </GalleryList>
 
           <ColorRingWrapper>
@@ -95,15 +105,24 @@ export default class ImageGallery extends Component {
       return (
         <>
           <GalleryList>
-            {images.map(({ id, webformatURL, tags }) => (
+            {images.map(({ id, webformatURL, largeImageURL, tags }) => (
               <ImageGalleryItem
                 key={id}
+                id={id}
                 webformatURL={webformatURL}
+                onCardClick={this.setActiveIndex}
+                largeImageURL={largeImageURL}
                 tags={tags}
+                idCard={id}
+                // onClick={() => {
+                //   this.setActiveIndex(id);
+                // }}
               />
             ))}
           </GalleryList>
-
+          {showModal && activeCard && (
+            <Modal activeCard={activeCard} closeModal={this.toggleModal} />
+          )}
           {!isEndOfListReached && (
             <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
           )}
