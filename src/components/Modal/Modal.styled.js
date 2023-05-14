@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Overlay = styled.div`
+export const Backdrop = styled.div`
   background-color: #00000045;
   position: fixed;
   top: 0;

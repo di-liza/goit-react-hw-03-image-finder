@@ -59,7 +59,6 @@ export default class ImageGallery extends Component {
     this.toggleModal();
   };
   toggleModal = () => {
-    console.log('click');
     return this.setState(({ showModal }) => ({
       showModal: !showModal,
     }));
@@ -108,19 +107,15 @@ export default class ImageGallery extends Component {
             {images.map(({ id, webformatURL, largeImageURL, tags }) => (
               <ImageGalleryItem
                 key={id}
-                id={id}
                 webformatURL={webformatURL}
                 onCardClick={this.setActiveIndex}
                 largeImageURL={largeImageURL}
                 tags={tags}
                 idCard={id}
-                // onClick={() => {
-                //   this.setActiveIndex(id);
-                // }}
               />
             ))}
           </GalleryList>
-          {showModal && activeCard && (
+          {showModal && (
             <Modal activeCard={activeCard} closeModal={this.toggleModal} />
           )}
           {!isEndOfListReached && (

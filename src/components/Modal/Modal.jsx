@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Overlay } from './Modal.styled';
+import { Backdrop } from './Modal.styled';
 
 import { createPortal } from 'react-dom';
 
@@ -42,7 +42,7 @@ export default class Modal extends Component {
   // Рендер
   render() {
     return createPortal(
-      <Overlay onClick={this.handleBackdropClose}>
+      <Backdrop onClick={this.handleBackdropClose}>
         <div className="modal">
           <img
             src={this.props.activeCard.largeImageURL}
@@ -50,7 +50,7 @@ export default class Modal extends Component {
             className="modalImg"
           />
         </div>
-      </Overlay>,
+      </Backdrop>,
       modalRoot
     );
   }
