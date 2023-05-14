@@ -40,6 +40,11 @@ export default class ImageGallery extends Component {
             this.setState({ status: 'idle' });
             return toast.info('Not found images for this query. Try again.');
           }
+          if (totalHits / 12 <= nextPage) {
+            toast.info(
+              `We're sorry, but you've reached the end of search results.`
+            );
+          }
           this.setState(prevState => ({
             images: [...prevState.images, ...hits],
             status: 'resolved',
