@@ -11,9 +11,7 @@ function fetchPixabay(query, page) {
     if (response.ok) {
       return response.json();
     }
-    return Promise.reject(
-      new Error(`Сan't find a collection of images called "${query}"`)
-    );
+    return Promise.reject(new Error(response.status));
   });
 }
 

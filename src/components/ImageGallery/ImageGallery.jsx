@@ -35,15 +35,13 @@ export default class ImageGallery extends Component {
     if (prevQuery !== nextQuery || prevPage !== nextPage) {
       this.setState({ status: 'pending', page: nextPage });
       PixabayApi.fetchPixabay(nextQuery, nextPage)
-        .then(data => {
-          console.log(data);
-          if (!data.total || !data.totalHits) {
+        .then(({ totalHits, total, hits }) => {
+          if (!total || !totalHits) {
             this.setState({ status: 'idle' });
             return toast.info('Not found images for this query. Try again.');
           }
-
           this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
+            images: [...prevState.images, ...hits],
             status: 'resolved',
             query: nextQuery,
           }));
@@ -64,7 +62,6 @@ export default class ImageGallery extends Component {
     this.setState(({ page }) => ({
       page: page + 1,
     }));
-    console.log('click');
   };
 
   setActiveIndex = id => {
@@ -82,9 +79,6 @@ export default class ImageGallery extends Component {
     const isEndOfListReached = images.length / 12 < page;
     const activeCard = images.find(({ id }) => id === activeCardId);
 
-    // if (isEndOfListReached) {
-    //   return toast.info('You reached the end of the collection.');
-    // }
     if (status === 'pending') {
       return (
         <>
