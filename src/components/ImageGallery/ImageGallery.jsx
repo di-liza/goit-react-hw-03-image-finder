@@ -38,7 +38,7 @@ export default class ImageGallery extends Component {
         .then(({ totalHits, total, hits }) => {
           if (!total || !totalHits) {
             this.setState({ status: 'idle' });
-            return toast.info('Not found images for this query. Try again.');
+            return toast.warning('Not found images for this query. Try again.');
           }
           if (totalHits / 12 <= nextPage) {
             toast.info(
