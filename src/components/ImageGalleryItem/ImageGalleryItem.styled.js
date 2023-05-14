@@ -1,4 +1,4 @@
-const { default: styled } = require('@emotion/styled');
+import styled from '@emotion/styled';
 
 export const Item = styled.li`
   height: 400px;
