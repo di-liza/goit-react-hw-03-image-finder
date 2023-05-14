@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import PixabayApi from '../services/pixabay-api';
 import Button from 'components/Button/Button';
 
+import { GalleryList } from './ImageGallery.styled';
+import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
+
 export default class ImageGallery extends Component {
   state = {
     images: [],
@@ -10,9 +13,9 @@ export default class ImageGallery extends Component {
     status: 'idle',
     query: '',
   };
+  loadImages = [];
 
   componentDidUpdate(prevProps) {
-    console.log('will update');
     const prevQuery = prevProps.searchQuery;
     const nextQuery = this.props.searchQuery;
 
@@ -30,24 +33,16 @@ export default class ImageGallery extends Component {
     }
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return (
-  //     this.state.images !== nextState.images ||
-  //     this.state.status !== nextState.status
-  //   );
-  // }
   handleLoadMoreBTN = () => {
     const { query, page, images } = this.state;
-
-    this.setState({ status: 'loadMore' });
     PixabayApi.fetchPixabay(query, page + 1)
-      .then(newImages => {
+      .then(newImages =>
         this.setState({
-          images: [...images, ...newImages.hits],
-          status: 'resolved',
+          images: images.concat(newImages.hits),
+          status: 'loadMore',
           page: page + 1,
-        });
-      })
+        })
+      )
       .catch(error => this.setState({ error, status: 'rejected' }));
   };
 
@@ -66,16 +61,31 @@ export default class ImageGallery extends Component {
     if (status === 'resolved') {
       return (
         <>
-          <ul>
-            {images.map(image => (
-              <li key={image.id}>
-                <a href={image.webformatURL}>
-                  <img src={image.webformatURL} alt={image.tags} />
-                  <p>{image.tags}</p>
-                </a>
-              </li>
+          <GalleryList>
+            {images.map(({ id, webformatURL, tags }) => (
+              <ImageGalleryItem
+                key={id}
+                webformatURL={webformatURL}
+                tags={tags}
+              />
             ))}
-          </ul>
+          </GalleryList>
+          <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
+        </>
+      );
+    }
+    if (status === 'loadMore') {
+      return (
+        <>
+          <GalleryList>
+            {images.map(({ id, webformatURL, tags }) => (
+              <ImageGalleryItem
+                key={id}
+                webformatURL={webformatURL}
+                tags={tags}
+              />
+            ))}
+          </GalleryList>
           <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
         </>
       );
