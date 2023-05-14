@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 
+import { ImSearch } from 'react-icons/im';
+import { toast } from 'react-toastify';
+
+import { Header } from './Searchbar.styled';
+
 export default class Searchbar extends Component {
   state = {
     query: '',
@@ -9,6 +14,9 @@ export default class Searchbar extends Component {
   };
   onFormSubmit = event => {
     event.preventDefault();
+    if (this.state.query.trim() === '') {
+      return toast.error('Please enter a name of collection.');
+    }
     this.props.onFormSubmit(this.state.query);
     this.resetForm();
   };
@@ -18,10 +26,12 @@ export default class Searchbar extends Component {
   render() {
     const { query } = this.state;
     return (
-      <header className="searchbar">
+      <Header className="searchbar">
         <form className="form" onSubmit={this.onFormSubmit}>
-          <button type="submit" className="button">
-            <span className="button-label">Search</span>
+          <button type="submit" className="buttonSearch">
+            <span className="button-label">
+              <ImSearch style={{ marginRight: 8 }} color="white" />
+            </span>
           </button>
 
           <input
@@ -34,7 +44,7 @@ export default class Searchbar extends Component {
             placeholder="Search images and photos"
           />
         </form>
-      </header>
+      </Header>
     );
   }
 }
