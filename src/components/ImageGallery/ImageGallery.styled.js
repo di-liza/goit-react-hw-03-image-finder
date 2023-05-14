@@ -7,3 +7,8 @@ export const GalleryList = styled.ul`
   margin: 50px auto;
   display: grid;
 `;
+
+export const ColorRingWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;

@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import PixabayApi from '../services/pixabay-api';
 import Button from 'components/Button/Button';
 
-import { GalleryList } from './ImageGallery.styled';
+import { GalleryList, ColorRingWrapper } from './ImageGallery.styled';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
+
+import { ColorRing } from 'react-loader-spinner';
 
 export default class ImageGallery extends Component {
   state = {
@@ -13,8 +15,6 @@ export default class ImageGallery extends Component {
     status: 'idle',
     query: '',
   };
-  firstLoadedImages = [];
-  loadMoreImages = [];
 
   componentDidUpdate(prevProps) {
     const prevQuery = prevProps.searchQuery;
@@ -22,44 +22,71 @@ export default class ImageGallery extends Component {
 
     if (prevQuery !== nextQuery) {
       this.setState({ status: 'pending', page: 1 });
-      PixabayApi.fetchPixabay(nextQuery, 1)
-        .then(images => {
-          this.firstLoadedImages = images.hits;
-          this.setState({
-            images: images.hits,
-            status: 'resolved',
-            query: nextQuery,
-          });
-        })
-        .catch(error => this.setState({ error, status: 'rejected' }));
+      setTimeout(() => {
+        PixabayApi.fetchPixabay(nextQuery, 1)
+          .then(images => {
+            this.setState({
+              images: images.hits,
+              status: 'resolved',
+              query: nextQuery,
+            });
+          })
+          .catch(error => this.setState({ error, status: 'rejected' }));
+      }, 1000);
     }
   }
 
   handleLoadMoreBTN = () => {
     const { query, page, images } = this.state;
-
-    PixabayApi.fetchPixabay(query, page + 1)
-      .then(newImages => {
-        this.loadMoreImages = newImages.hits;
-        this.setState({
-          images: images.concat(newImages.hits),
-          status: 'loadMore',
-          page: page + 1,
-        });
-      })
-      .catch(error => this.setState({ error, status: 'rejected' }));
+    this.setState({ status: 'pending' });
+    setTimeout(() => {
+      PixabayApi.fetchPixabay(query, page + 1)
+        .then(newImages => {
+          this.setState({
+            images: images.concat(newImages.hits),
+            status: 'resolved',
+            page: page + 1,
+          });
+        })
+        .catch(error => this.setState({ error, status: 'rejected' }));
+    }, 1000);
   };
 
   render() {
-    const { images, error, status } = this.state;
-    console.log('images:' + images.length);
-    console.log('this.loadMoreImages:' + this.loadMoreImages.length);
+    const { images, error, status, page } = this.state;
+    console.log(status);
+
+    const isEndOfListReached = images.length / 12 < page;
 
     if (status === 'idle') {
       return <p>Please, enter the name of image for search</p>;
     }
     if (status === 'pending') {
-      return 'Loading...';
+      return (
+        <>
+          <GalleryList>
+            {images.map(({ id, webformatURL, tags }) => (
+              <ImageGalleryItem
+                key={id}
+                webformatURL={webformatURL}
+                tags={tags}
+              />
+            ))}
+          </GalleryList>
+
+          <ColorRingWrapper>
+            <ColorRing
+              visible={true}
+              height="80"
+              width="80"
+              ariaLabel="blocks-loading"
+              wrapperStyle={{}}
+              wrapperClass="blocks-wrapper"
+              colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+            />
+          </ColorRingWrapper>
+        </>
+      );
     }
     if (status === 'rejected') {
       return <p>{error}</p>;
@@ -77,32 +104,11 @@ export default class ImageGallery extends Component {
             ))}
           </GalleryList>
 
-          {this.firstLoadedImages.length >= 12 && (
+          {!isEndOfListReached && (
             <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
           )}
         </>
       );
     }
-    if (status === 'loadMore' && images.length > 0) {
-      return (
-        <>
-          <GalleryList>
-            {images.map(({ id, webformatURL, tags }) => (
-              <ImageGalleryItem
-                key={id}
-                webformatURL={webformatURL}
-                tags={tags}
-              />
-            ))}
-          </GalleryList>
-
-          {this.loadMoreImages.length >= 12 && (
-            <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
-          )}
-        </>
-      );
-    }
-    // Если массив images пустой, то не рендерим кнопку
-    return null;
   }
 }
