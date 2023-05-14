@@ -5,20 +5,6 @@ import { createPortal } from 'react-dom';
 
 const modalRoot = document.getElementById('modal');
 
-// export default function Modal({ activeCard }) {
-//   console.log(activeCard);
-//   return (
-//     <Overlay>
-//       <div className="modal">
-//         <img
-//           src={activeCard.largeImageURL}
-//           alt={activeCard.tags}
-//           className="modalImg"
-//         />
-//       </div>
-//     </Overlay>
-//   );
-// }
 export default class Modal extends Component {
   // Закрытие модалки по клику на Escape
   componentDidMount() {

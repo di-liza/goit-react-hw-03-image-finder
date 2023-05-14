@@ -29,14 +29,12 @@ export default class Searchbar extends Component {
       <Header className="searchbar">
         <form className="form" onSubmit={this.onFormSubmit}>
           <button type="submit" className="buttonSearch">
-            <span className="button-label">
-              <ImSearch style={{ marginRight: 8 }} color="white" />
-            </span>
+            <ImSearch color="grey" />
           </button>
 
           <input
             onChange={this.onInputChange}
-            className="input"
+            className="searchForm-input"
             type="text"
             value={query}
             autoComplete="off"

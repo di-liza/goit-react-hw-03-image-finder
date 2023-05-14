@@ -2,10 +2,16 @@ import React, { Component } from 'react';
 import PixabayApi from '../services/pixabay-api';
 import Button from 'components/Button/Button';
 
-import { GalleryList, ColorRingWrapper } from './ImageGallery.styled';
+import {
+  GalleryList,
+  ColorRingWrapper,
+  ErrorMessage,
+} from './ImageGallery.styled';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Modal from '../Modal';
 import { ColorRing } from 'react-loader-spinner';
+
+import { toast } from 'react-toastify';
 
 export default class ImageGallery extends Component {
   state = {
@@ -18,40 +24,47 @@ export default class ImageGallery extends Component {
     activeCardId: 0,
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
+    const searchQuery = this.props.searchQuery;
     const prevQuery = prevProps.searchQuery;
     const nextQuery = this.props.searchQuery;
 
-    if (prevQuery !== nextQuery) {
-      this.setState({ status: 'pending', page: 1 });
-      setTimeout(() => {
-        PixabayApi.fetchPixabay(nextQuery, 1)
-          .then(images => {
-            this.setState({
-              images: images.hits,
-              status: 'resolved',
-              query: nextQuery,
-            });
-          })
-          .catch(error => this.setState({ error, status: 'rejected' }));
-      }, 1000);
+    const prevPage = prevState.page;
+    const nextPage = this.state.page;
+
+    if (prevQuery !== nextQuery || prevPage !== nextPage) {
+      this.setState({ status: 'pending', page: nextPage });
+      PixabayApi.fetchPixabay(nextQuery, nextPage)
+        .then(data => {
+          console.log(data);
+          if (!data.total || !data.totalHits) {
+            this.setState({ status: 'idle' });
+            return toast.info('Not found images for this query. Try again.');
+          }
+
+          this.setState(prevState => ({
+            images: [...prevState.images, ...data.hits],
+            status: 'resolved',
+            query: nextQuery,
+          }));
+        })
+        .catch(error => this.setState({ error, status: 'rejected' }));
+    }
+    if (prevProps !== this.props) {
+      this.setState({
+        query: searchQuery,
+        images: [],
+        error: false,
+        page: 1,
+      });
     }
   }
 
   handleLoadMoreBTN = () => {
-    const { query, page, images } = this.state;
-    this.setState({ status: 'pending' });
-    setTimeout(() => {
-      PixabayApi.fetchPixabay(query, page + 1)
-        .then(newImages => {
-          this.setState({
-            images: images.concat(newImages.hits),
-            status: 'resolved',
-            page: page + 1,
-          });
-        })
-        .catch(error => this.setState({ error, status: 'rejected' }));
-    }, 1000);
+    this.setState(({ page }) => ({
+      page: page + 1,
+    }));
+    console.log('click');
   };
 
   setActiveIndex = id => {
@@ -64,10 +77,14 @@ export default class ImageGallery extends Component {
     }));
   };
   render() {
-    const { images, error, status, page, activeCardId, showModal } = this.state;
+    const { images, status, activeCardId, showModal, page } = this.state;
+
     const isEndOfListReached = images.length / 12 < page;
     const activeCard = images.find(({ id }) => id === activeCardId);
 
+    // if (isEndOfListReached) {
+    //   return toast.info('You reached the end of the collection.');
+    // }
     if (status === 'pending') {
       return (
         <>
@@ -91,14 +108,14 @@ export default class ImageGallery extends Component {
               ariaLabel="blocks-loading"
               wrapperStyle={{}}
               wrapperClass="blocks-wrapper"
-              colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+              colors={['#935be1', '#f460ca', '#6a9ef8', '#900bcd', '#361dd4']}
             />
           </ColorRingWrapper>
         </>
       );
     }
     if (status === 'rejected') {
-      return <p>{error}</p>;
+      return <ErrorMessage>Something went wrong, try again.</ErrorMessage>;
     }
     if (status === 'resolved') {
       return (
@@ -118,6 +135,7 @@ export default class ImageGallery extends Component {
           {showModal && (
             <Modal activeCard={activeCard} closeModal={this.toggleModal} />
           )}
+
           {!isEndOfListReached && (
             <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
           )}
