@@ -8,10 +8,10 @@ export const GalleryList = styled.ul`
   display: grid;
 `;
 
-export const ColorRingWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
+// export const ColorRingWrapper = styled.div`
+//   display: flex;
+//   justify-content: center;
+// `;
 
 export const ErrorMessage = styled.p`
   margin: 0 auto;

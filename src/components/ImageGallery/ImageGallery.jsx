@@ -2,18 +2,22 @@ import React, { Component } from 'react';
 import PixabayApi from '../services/pixabay-api';
 import Button from 'components/Button/Button';
 
-import {
-  GalleryList,
-  ColorRingWrapper,
-  ErrorMessage,
-} from './ImageGallery.styled';
+import PropTypes from 'prop-types';
+
+import Loader from '../Loader';
+
+import { GalleryList, ErrorMessage } from './ImageGallery.styled';
+
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Modal from '../Modal';
-import { ColorRing } from 'react-loader-spinner';
+// import { ColorRing } from 'react-loader-spinner';
 
 import { toast } from 'react-toastify';
 
 export default class ImageGallery extends Component {
+  static propTypes = {
+    searchQuery: PropTypes.string.isRequired,
+  };
   state = {
     images: [],
     page: 1,
@@ -99,17 +103,7 @@ export default class ImageGallery extends Component {
             })}
           </GalleryList>
 
-          <ColorRingWrapper>
-            <ColorRing
-              visible={true}
-              height="80"
-              width="80"
-              ariaLabel="blocks-loading"
-              wrapperStyle={{}}
-              wrapperClass="blocks-wrapper"
-              colors={['#935be1', '#f460ca', '#6a9ef8', '#900bcd', '#361dd4']}
-            />
-          </ColorRingWrapper>
+          <Loader />
         </>
       );
     }
@@ -120,12 +114,11 @@ export default class ImageGallery extends Component {
       return (
         <>
           <GalleryList>
-            {images.map(({ id, webformatURL, largeImageURL, tags }) => (
+            {images.map(({ id, webformatURL, tags }) => (
               <ImageGalleryItem
                 key={id}
                 webformatURL={webformatURL}
                 onCardClick={this.setActiveIndex}
-                largeImageURL={largeImageURL}
                 tags={tags}
                 idCard={id}
               />

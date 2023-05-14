@@ -1,10 +1,9 @@
 import React from 'react';
 import { Item } from './ImageGalleryItem.styled';
-// import Modal from '../Modal';
+import PropTypes from 'prop-types';
 
 export default function ImageGalleryItem({
   webformatURL,
-  largeImageURL,
   onCardClick,
   tags,
   idCard,
@@ -25,3 +24,10 @@ export default function ImageGalleryItem({
     </>
   );
 }
+
+ImageGalleryItem.propTypes = {
+  webformatURL: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
+  onCardClick: PropTypes.func.isRequired,
+  idCard: PropTypes.number.isRequired,
+};

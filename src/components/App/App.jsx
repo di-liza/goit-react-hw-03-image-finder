@@ -4,8 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import ImageGallery from '../ImageGallery';
 import Searchbar from 'components/Searchbar/Searchbar';
-// import fetchPixabay from '../services/pixabay-api';
-// import fetchImage from 'components/ImageGallery/ImageGallery';
 
 export default class App extends Component {
   state = {

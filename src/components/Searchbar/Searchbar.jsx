@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { ImSearch } from 'react-icons/im';
 import { toast } from 'react-toastify';
@@ -6,13 +7,17 @@ import { toast } from 'react-toastify';
 import { Header } from './Searchbar.styled';
 
 export default class Searchbar extends Component {
+  static propTypes = {
+    onFormSubmit: PropTypes.func.isRequired,
+  };
+
   state = {
     query: '',
   };
   onInputChange = ({ target: { value } }) => {
     this.setState({ query: value });
   };
-  onFormSubmit = event => {
+  hanldeFormSubmit = event => {
     event.preventDefault();
     if (this.state.query.trim() === '') {
       return toast.error('Please enter a name of collection.');
@@ -27,7 +32,7 @@ export default class Searchbar extends Component {
     const { query } = this.state;
     return (
       <Header className="searchbar">
-        <form className="form" onSubmit={this.onFormSubmit}>
+        <form className="form" onSubmit={this.hanldeFormSubmit}>
           <button type="submit" className="buttonSearch">
             <ImSearch color="grey" />
           </button>
