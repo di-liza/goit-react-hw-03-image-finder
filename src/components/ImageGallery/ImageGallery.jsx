@@ -88,25 +88,6 @@ export default class ImageGallery extends Component {
     const isEndOfListReached = images.length / 12 < page;
     const activeCard = images.find(({ id }) => id === activeCardId);
 
-    // if (status === 'pending') {
-    //   return (
-    //     <>
-    //       <GalleryList>
-    //         {images.map(({ id, webformatURL, tags }) => {
-    //           return (
-    //             <ImageGalleryItem
-    //               key={id}
-    //               webformatURL={webformatURL}
-    //               tags={tags}
-    //             />
-    //           );
-    //         })}
-    //       </GalleryList>
-
-    //       <Loader />
-    //     </>
-    //   );
-    // }
     if (status === 'rejected') {
       return <ErrorMessage>Something went wrong, try again.</ErrorMessage>;
     }
