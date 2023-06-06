@@ -88,29 +88,29 @@ export default class ImageGallery extends Component {
     const isEndOfListReached = images.length / 12 < page;
     const activeCard = images.find(({ id }) => id === activeCardId);
 
-    if (status === 'pending') {
-      return (
-        <>
-          <GalleryList>
-            {images.map(({ id, webformatURL, tags }) => {
-              return (
-                <ImageGalleryItem
-                  key={id}
-                  webformatURL={webformatURL}
-                  tags={tags}
-                />
-              );
-            })}
-          </GalleryList>
+    // if (status === 'pending') {
+    //   return (
+    //     <>
+    //       <GalleryList>
+    //         {images.map(({ id, webformatURL, tags }) => {
+    //           return (
+    //             <ImageGalleryItem
+    //               key={id}
+    //               webformatURL={webformatURL}
+    //               tags={tags}
+    //             />
+    //           );
+    //         })}
+    //       </GalleryList>
 
-          <Loader />
-        </>
-      );
-    }
+    //       <Loader />
+    //     </>
+    //   );
+    // }
     if (status === 'rejected') {
       return <ErrorMessage>Something went wrong, try again.</ErrorMessage>;
     }
-    if (status === 'resolved') {
+    if (status === 'resolved' || status === 'pending') {
       return (
         <>
           <GalleryList>
@@ -127,6 +127,8 @@ export default class ImageGallery extends Component {
           {showModal && (
             <Modal activeCard={activeCard} closeModal={this.toggleModal} />
           )}
+
+          {status === 'pending' && <Loader />}
 
           {!isEndOfListReached && (
             <Button handleLoadMoreBTN={this.handleLoadMoreBTN} />
